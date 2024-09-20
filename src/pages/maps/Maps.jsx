@@ -5,9 +5,8 @@ import { PolygonLayer } from '@deck.gl/layers';
 import axios from 'axios';
 import { MapPin } from 'lucide-react'; // Import the location pin icon
 
-const PKEY = 'pk.eyJ1IjoiMWV1Z2VuZWRldiIsImEiOiJjbHprMDEwZjEwMGdhMmpzYzhuZm1sMzZ0In0.4AI9CH3UZTnPMgK6p-fGNw'; 
+const PKEY = 'pk.eyJ1IjoiMWV1Z2VuZWRldiIsImEiOiJjbHprMDEwZjEwMGdhMmpzYzhuZm1sMzZ0In0.4AI9CH3UZTnPMgK6p-fGNw';
 const MAP_STYLE = 'mapbox://styles/mapbox/streets-v11'; // Flat street style
-
 const INITIAL_VIEW_STATE = {
   longitude: 0.4697674512863159,
   latitude: 6.590838339577427,
@@ -35,6 +34,24 @@ function Maps() {
     fetchPlacesAndSpaces();
   }, []);
 
+  const renderMarker = (item) => {
+    const hasImage = item.images && item.images.length > 0;
+    return (
+      <Marker
+        key={item.id}
+        longitude={item.longitude}
+        latitude={item.latitude}
+        anchor="bottom"
+      >
+        {hasImage ? (
+          <img src={item.images[0].image} alt={item.name} className="w-10 h-10 rounded-full" />
+        ) : (
+          <MapPin className="w-10 h-10 text-red-500" />
+        )}
+      </Marker>
+    );
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6">Campus Map</h1>
@@ -47,27 +64,9 @@ function Maps() {
           mapboxAccessToken={PKEY}
         >
           {/* Render markers for places */}
-          {places.map((place) => (
-            <Marker
-              key={place.id}
-              longitude={place.longitude}
-              latitude={place.latitude}
-              anchor="bottom"
-            >
-              <img src={place.images[0].image} alt={place.name} className="w-10 h-10 rounded-full" />
-            </Marker>
-          ))}
+          {places.map(renderMarker)}
           {/* Render markers for spaces */}
-          {spaces.map((space) => (
-            <Marker
-              key={space.id}
-              longitude={space.longitude}
-              latitude={space.latitude}
-              anchor="bottom"
-            >
-              <img src={space.images[0].image} alt={space.name} className="w-10 h-10 rounded-full" />
-            </Marker>
-          ))}
+          {spaces.map(renderMarker)}
         </Map>
       </DeckGL>
     </div>
